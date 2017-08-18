@@ -17,8 +17,6 @@ THREE.ShaderExtras = require('imports-loader?THREE=three!exports-loader?THREE.Sh
 THREE.ShaderPass = require('imports-loader?THREE=three!exports-loader?THREE.ShaderPass!three/examples/js/postprocessing/ShaderPass');
 THREE.BloomPass = require('imports-loader?THREE=three!exports-loader?THREE.BloomPass!three/examples/js/postprocessing/BloomPass')
 
-const particleTree = require('assets_path/img/tree.png')
-
 export default class Canvas extends React.Component {
   constructor(props) {
     super()
@@ -45,11 +43,11 @@ export default class Canvas extends React.Component {
     this.renderer.autoClear = false
     let renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, stencilBufer: false }
     let renderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, renderTargetParameters )
-    let effectBloom = new THREE.BloomPass( 0.6 )
+    let effectBloom = new THREE.BloomPass( 0.9 )
     let effectBleach = new THREE.ShaderPass( THREE.ShaderExtras[ "bleachbypass" ] )
     let hblur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalTiltShift" ] )
     let vblur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalTiltShift" ] )
-    let bluriness = 3
+    let bluriness = 2
     hblur.uniforms[ 'h' ].value = bluriness / window.innerWidth
     vblur.uniforms[ 'v' ].value = bluriness / window.innerHeight
     hblur.uniforms[ 'r' ].value = vblur.uniforms[ 'r' ].value = 0.5
@@ -63,6 +61,29 @@ export default class Canvas extends React.Component {
     this.composer.addPass( hblur )
     this.composer.addPass( vblur )
 
+    /**
+    this.renderer.autoClear = false
+    let renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, stencilBufer: false }
+    let renderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, renderTargetParameters )
+    let effectBloom = new THREE.BloomPass( 1.9 )
+    let effectBleach = new THREE.ShaderPass( THREE.ShaderExtras[ "bleachbypass" ] )
+    let hblur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalTiltShift" ] )
+    let vblur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalTiltShift" ] )
+    let bluriness = 2
+    hblur.uniforms[ 'h' ].value = bluriness / window.innerWidth
+    vblur.uniforms[ 'v' ].value = bluriness / window.innerHeight
+    hblur.uniforms[ 'r' ].value = vblur.uniforms[ 'r' ].value = 0.5
+    effectBleach.uniforms[ 'opacity' ].value = 0.65
+    this.composer = new THREE.EffectComposer( this.renderer, renderTarget )
+    var renderModel = new THREE.RenderPass( this.scene, this.camera )
+    vblur.renderToScreen = true
+    this.composer = new THREE.EffectComposer( this.renderer, renderTarget )
+    this.composer.addPass( renderModel )
+    this.composer.addPass( effectBloom )
+    this.composer.addPass( hblur )
+    this.composer.addPass( vblur )
+     */
+
     return false
   }
   componentWillUnmount() {
@@ -74,7 +95,7 @@ export default class Canvas extends React.Component {
     document.body.appendChild(this.renderer.domElement)
 
     this.loaderManager = new LoadingManager()
-    this.textureParticleTree = new TextureLoader( this.loaderManager ).load( particleTree )
+    self.ready()
 
     this.events()
     this.loader()
@@ -105,8 +126,6 @@ export default class Canvas extends React.Component {
     this.sun = new Sun()
     this.scene.add(this.sun)
 
-
-
     this.isReady = true
   }
   init(){
@@ -114,7 +133,7 @@ export default class Canvas extends React.Component {
   events(){
     const self = this
     $(window).on('mousemove mousedown mouseup', (e) => {
-       self.cameraTilt(e.pageX, e.pageY, e.type)
+      //  self.cameraTilt(e.pageX, e.pageY, e.type)
     })
     $(window).on('resize', (e) => {
        self.resize()
@@ -138,13 +157,13 @@ export default class Canvas extends React.Component {
       ry = 0
     }
     TweenMax.to(this.camera.rotation, 2, {
-      x: rx*0.5,
-      y: ry*0.05,
+      x: rx * 10,
+      y: ry * 10,
       ease: Power4.easeOut
     })
     TweenMax.to(this.camera.position, 4, {
-      x: settings.camera.position.x + nx*10,
-      y: settings.camera.position.y + ny * 2,
+      x: settings.camera.position.x + nx * 10,
+      y: settings.camera.position.y + ny * 10,
       ease: Power4.easeOut
     })
   }
